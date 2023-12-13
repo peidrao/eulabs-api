@@ -2,7 +2,9 @@ package controlers
 
 import (
 	"net/http"
+	"strconv"
 
+	vl "github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 	"github.com/peidrao/eulabs-api/domain/models"
 	"github.com/peidrao/eulabs-api/domain/services"
@@ -11,12 +13,14 @@ import (
 
 type ProductController struct {
 	productService services.ProductService
+	validate       vl.Validate
 }
 
 func NewProductController(db *gorm.DB) ProductController {
 	service := services.NewProductService(db)
 	controller := ProductController{
 		productService: service,
+		validate:       *vl.New(),
 	}
 
 	return controller
@@ -24,8 +28,8 @@ func NewProductController(db *gorm.DB) ProductController {
 
 func (controller ProductController) Create(c echo.Context) error {
 	type payload struct {
-		Name  string  `json:"name"`
-		Price float64 `json:"price"`
+		Name  string  `json:"name" validate:"required"`
+		Price float64 `json:"price" validate:"required"`
 	}
 
 	payloadValidator := new(payload)
@@ -34,13 +38,11 @@ func (controller ProductController) Create(c echo.Context) error {
 		return err
 	}
 
-	if payloadValidator.Name == "" || payloadValidator.Price == 0.0 {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"error": "Name and Price cannot be empty",
-		})
+	if err := controller.validate.Struct(payloadValidator); err != nil {
+		return err
 	}
 
-	result := controller.productService.Create(
+	controller.productService.Create(
 		models.Product{
 			Name:  payloadValidator.Name,
 			Price: payloadValidator.Price,
@@ -48,6 +50,49 @@ func (controller ProductController) Create(c echo.Context) error {
 	)
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"data": "",
+	})
+}
+
+func (controller ProductController) Update(c echo.Context) error {
+	type payload struct {
+		Name  string  `json:"name" validate:"required"`
+		Price float64 `json:"price" validate:"required"`
+	}
+
+	payloadValidator := new(payload)
+
+	if err := c.Bind(payloadValidator); err != nil {
+		return err
+	}
+
+	idItem, _ := strconv.Atoi(c.Param("id"))
+	result := controller.productService.Update(
+		idItem,
+		models.Product{
+			Name:  payloadValidator.Name,
+			Price: payloadValidator.Price,
+		},
+	)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"data": result,
 	})
+}
+
+func (controller ProductController) Delete(c echo.Context) error {
+	productId, _ := strconv.Atoi(c.Param("id"))
+	result := controller.productService.Delete(productId)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"data": result,
+	})
+}
+
+func (controller ProductController) GetById(c echo.Context) error {
+	productId, _ := strconv.Atoi(c.Param("id"))
+
+	result := controller.productService.GetById(productId)
+
+	return c.JSON(http.StatusOK, result)
 }

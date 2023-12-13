@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -23,14 +21,12 @@ func main() {
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"hello": "world",
-		})
-	})
-
 	productController := controlers.NewProductController(db)
+
 	apiV1.POST("product/", productController.Create)
+	apiV1.PUT("product/:id", productController.Update)
+	apiV1.DELETE("product/:id", productController.Delete)
+	apiV1.GET("product/:id", productController.GetById)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
