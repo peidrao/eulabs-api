@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/peidrao/eulabs-api/domain/models"
 	"github.com/peidrao/eulabs-api/domain/repositories"
@@ -17,7 +17,7 @@ type ProductService interface {
 	Create(product models.Product) utils.Response
 	Delete(productId int) utils.Response
 	Update(productId int, product models.Product) utils.Response
-	GetById(productId int) utils.ProductResponse
+	GetById(productId int) utils.Response
 }
 
 func NewProductService(db *gorm.DB) ProductService {
@@ -26,21 +26,27 @@ func NewProductService(db *gorm.DB) ProductService {
 
 func (service *productService) Create(product models.Product) utils.Response {
 	var response utils.Response
-	if err := service.productRepo.Create(product); err != nil {
-		response.Status = 200
-		response.Messages = "Success to create a new product"
+	data, err := service.productRepo.Create(product)
+	if err != nil {
+		response.Data = err.Error()
+		response.Status = http.StatusBadRequest
+	} else {
+		response.Data = data
+		response.Status = http.StatusCreated
+
 	}
+
 	return response
 }
 
 func (service *productService) Delete(productId int) utils.Response {
 	var response utils.Response
+
 	if err := service.productRepo.Delete(productId); err != nil {
-		response.Status = 400
-		response.Messages = fmt.Sprint("Failed to delete product: ", productId)
+		response.Status = http.StatusNotFound
+		response.Data = err.Error()
 	} else {
-		response.Status = 200
-		response.Messages = "Success to delete product"
+		response.Status = http.StatusNoContent
 	}
 	return response
 }
@@ -48,18 +54,26 @@ func (service *productService) Delete(productId int) utils.Response {
 func (service *productService) Update(productId int, product models.Product) utils.Response {
 	var response utils.Response
 	if err := service.productRepo.Update(productId, product); err != nil {
-		response.Status = 400
-		response.Messages = fmt.Sprint("Failed to update product: ", productId)
+		response.Status = http.StatusBadRequest
+		response.Data = err.Error()
 	} else {
-		response.Status = 200
-		response.Messages = "Success to update product"
+		productUpdated := service.GetById(productId)
+		response.Status = http.StatusOK
+		response.Data = productUpdated.Data
 	}
 	return response
 }
 
-func (service *productService) GetById(productId int) utils.ProductResponse {
-	var response utils.ProductResponse
-	data, _ := service.productRepo.Get(productId)
-	response.Product = data
+func (service *productService) GetById(productId int) utils.Response {
+	var response utils.Response
+	product, err := service.productRepo.Get(productId)
+	if err != nil {
+		response.Data = err.Error()
+		response.Status = http.StatusNotFound
+	} else {
+		response.Data = product
+		response.Status = http.StatusOK
+
+	}
 	return response
 }
