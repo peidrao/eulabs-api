@@ -10,7 +10,7 @@ type dbProduct struct {
 }
 
 type ProductRepository interface {
-	Create(product models.Product) error
+	Create(product models.Product) (models.Product, error)
 	Delete(productId int) error
 	Update(productId int, product models.Product) error
 	Get(productId int) (models.Product, error)
@@ -20,11 +20,21 @@ func NewProductRepository(Conn *gorm.DB) ProductRepository {
 	return &dbProduct{Conn: Conn}
 }
 
-func (db *dbProduct) Create(product models.Product) error {
-	return db.Conn.Create(&product).Error
+func (db *dbProduct) Create(product models.Product) (models.Product, error) {
+	result := db.Conn.Create(&product)
+	if result.Error != nil {
+		return models.Product{}, result.Error
+	}
+	return product, nil
 }
 
 func (db *dbProduct) Delete(productId int) error {
+	var existingProduct models.Product
+	err := db.Conn.First(&existingProduct, productId).Error
+	if err != nil {
+		return err
+	}
+
 	return db.Conn.Delete(&models.Product{ID: productId}).Error
 }
 
