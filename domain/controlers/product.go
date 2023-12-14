@@ -42,19 +42,19 @@ func (controller ProductController) Create(c echo.Context) error {
 		return err
 	}
 
-	controller.productService.Create(
+	response := controller.productService.Create(
 		models.Product{
 			Name:  payloadValidator.Name,
 			Price: payloadValidator.Price,
 		},
 	)
 
-	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"data": "",
-	})
+	return c.JSON(response.Status, response.Data)
 }
 
 func (controller ProductController) Update(c echo.Context) error {
+	productId, _ := strconv.Atoi(c.Param("id"))
+
 	type payload struct {
 		Name  string  `json:"name" validate:"required"`
 		Price float64 `json:"price" validate:"required"`
@@ -63,36 +63,37 @@ func (controller ProductController) Update(c echo.Context) error {
 	payloadValidator := new(payload)
 
 	if err := c.Bind(payloadValidator); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	idItem, _ := strconv.Atoi(c.Param("id"))
-	result := controller.productService.Update(
-		idItem,
+	if err := controller.validate.Struct(payloadValidator); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
+	response := controller.productService.Update(
+		productId,
 		models.Product{
 			Name:  payloadValidator.Name,
 			Price: payloadValidator.Price,
 		},
 	)
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": result,
-	})
+	return c.JSON(response.Status, response.Data)
 }
 
 func (controller ProductController) Delete(c echo.Context) error {
 	productId, _ := strconv.Atoi(c.Param("id"))
 	result := controller.productService.Delete(productId)
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": result,
-	})
+	return c.JSON(result.Status, result)
 }
 
 func (controller ProductController) GetById(c echo.Context) error {
 	productId, _ := strconv.Atoi(c.Param("id"))
 
-	result := controller.productService.GetById(productId)
+	response := controller.productService.GetById(productId)
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(response.Status, response.Data)
 }
