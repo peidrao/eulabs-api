@@ -93,7 +93,7 @@ func (controller ProductController) Delete(c echo.Context) error {
 func (controller ProductController) GetById(c echo.Context) error {
 	productId, _ := strconv.Atoi(c.Param("id"))
 
-	response := controller.productService.GetById(productId)
+	response := controller.productService.Retrieve(productId)
 
 	return c.JSON(response.Status, response.Data)
 }
