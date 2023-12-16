@@ -1,4 +1,4 @@
-package controlers
+package controllers
 
 import (
 	"net/http"
@@ -35,11 +35,15 @@ func (controller ProductController) Create(c echo.Context) error {
 	payloadValidator := new(payload)
 
 	if err := c.Bind(payloadValidator); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
 	if err := controller.validate.Struct(payloadValidator); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
 	response := controller.productService.Create(
@@ -63,7 +67,9 @@ func (controller ProductController) Update(c echo.Context) error {
 	payloadValidator := new(payload)
 
 	if err := c.Bind(payloadValidator); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
 	if err := controller.validate.Struct(payloadValidator); err != nil {
