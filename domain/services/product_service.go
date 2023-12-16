@@ -17,7 +17,7 @@ type ProductService interface {
 	Create(product models.Product) utils.Response
 	Delete(productId int) utils.Response
 	Update(productId int, product models.Product) utils.Response
-	GetById(productId int) utils.Response
+	Retrieve(productId int) utils.Response
 }
 
 func NewProductService(db *gorm.DB) ProductService {
@@ -33,9 +33,7 @@ func (service *productService) Create(product models.Product) utils.Response {
 	} else {
 		response.Data = data
 		response.Status = http.StatusCreated
-
 	}
-
 	return response
 }
 
@@ -53,18 +51,19 @@ func (service *productService) Delete(productId int) utils.Response {
 
 func (service *productService) Update(productId int, product models.Product) utils.Response {
 	var response utils.Response
+	
 	if err := service.productRepo.Update(productId, product); err != nil {
 		response.Status = http.StatusBadRequest
 		response.Data = err.Error()
 	} else {
-		productUpdated := service.GetById(productId)
+		productUpdated := service.Retrieve(productId)
 		response.Status = http.StatusOK
 		response.Data = productUpdated.Data
 	}
 	return response
 }
 
-func (service *productService) GetById(productId int) utils.Response {
+func (service *productService) Retrieve(productId int) utils.Response {
 	var response utils.Response
 	product, err := service.productRepo.Get(productId)
 	if err != nil {
