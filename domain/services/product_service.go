@@ -51,7 +51,6 @@ func (service *productService) Delete(productId int) utils.Response {
 
 func (service *productService) Update(productId int, product models.Product) utils.Response {
 	var response utils.Response
-	
 	if err := service.productRepo.Update(productId, product); err != nil {
 		response.Status = http.StatusBadRequest
 		response.Data = err.Error()

@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/peidrao/eulabs-api/config"
-	"github.com/peidrao/eulabs-api/domain/controlers"
+	"github.com/peidrao/eulabs-api/domain/controllers"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
 
-	productController := controlers.NewProductController(db)
+	productController := controllers.NewProductController(db)
 
 	apiV1.POST("product/", productController.Create)
 	apiV1.PUT("product/:id", productController.Update)
