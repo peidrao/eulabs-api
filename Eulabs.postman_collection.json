@@ -1,0 +1,55 @@
+{
+	"info": {
+		"_postman_id": "838ec69b-67aa-4878-b19b-3b335fc5d4e6",
+		"name": "Eulabs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "9995713"
+	},
+	"item": [
+		{
+			"name": "Retrieve Product",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/v1/product/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"price\": 12.2001,\n\t\"name\": \"redbone\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/v1/product/"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Product",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/v1/product/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Product",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/api/v1/product/1"
+			},
+			"response": []
+		}
+	]
+}
