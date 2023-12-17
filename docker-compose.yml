@@ -11,3 +11,11 @@ services:
       - "3306:3306"
     volumes:
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
