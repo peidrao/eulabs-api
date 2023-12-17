@@ -51,16 +51,16 @@ curl -X POST -H "Content-Type: application/json" -d '{"name": "Produto A", "pric
 
 ```bash
 curl http://localhost:8080/api/v1/product/1
-```bash
+```
 
 - `PUT /api/v1/product/{id_produto}` - Atualizar informações de um produto
 
 ```bash
 curl -X PUT -H "Content-Type: application/json" -d '{"name": "Produto B", "price": 39.99}' http://localhost:8080/api/v1/product/1
-```bash
+```
 
 - `DELETE /api/v1/product/{id_produto}` - Remover um produto 
 
 ```bash
 curl -X DELETE http://localhost:8080/api/v1/product/1
-```bash
+```
