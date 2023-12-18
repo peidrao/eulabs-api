@@ -8,9 +8,9 @@ Antes de começar, certifique-se de ter os seguintes requisitos instalados:
 
 ## Considerações sobre o projeto
 
-- Todos os requisitos foram atendidods
+- Todos os requisitos foram atendidos
 - O projeto foi dockerizado por completo.
-- Foi adicionado um arquivo Makefile, para termos uma maior agilidade em executarmos alguns comandos.
+- Foi adicionado um arquivo Makefile para termos uma maior agilidade em executarmos alguns comandos.
 
 ## Comandos pelo Makefile
 
